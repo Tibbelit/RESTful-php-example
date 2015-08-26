@@ -132,7 +132,7 @@
         $movie = $db->update("movie", $data, ["id[=]" => $id]);
         if($movie){
             $app->response->setStatus(200);
-            $movie = $db->select("movie", "*", ["id[=]" => $movie]);
+            $movie = $db->select("movie", "*", ["id[=]" => $id]);
             if($app->request()->get('format') == "xml" or $app->request->headers->get('ACCEPT') == "application/xml"){
                 $app->response->headers->set('Content-Type', 'application/xml');
                 // Creating object of SimpleXMLElement
