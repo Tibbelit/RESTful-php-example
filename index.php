@@ -37,7 +37,7 @@ $app->get ( '/', function () use($app, $db) {
 } );
 
 /*
- * Returns all moveis
+ * Returns all movies
  */
 $app->get ( '/movies', function () use($app, $db) {
 	$app->response->setStatus ( 200 );
