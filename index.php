@@ -86,7 +86,7 @@
 		$data = $app->request->post();
         $movie = $db->insert("movie", $data);
         if($movie){
-            $app->response->setStatus(200);
+            $app->response->setStatus(201);
             $movie = $db->select("movie", "*", ["id[=]" => $movie]);
             if($app->request()->get('format') == "xml" or $app->request->headers->get('ACCEPT') == "application/xml"){
                 $app->response->headers->set('Content-Type', 'application/xml');
