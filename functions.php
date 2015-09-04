@@ -74,27 +74,43 @@ function listAllMovies($app, $db) {
 function addMovie($app, $db) {
 	$app->response->setStatus ( 200 );
 	
-	$movie = $db->select ( "movie", "*", [
-			"id[=]" => $id
-	] );
-	if ($app->request ()->get ( 'format' ) == "json" or $app->request->headers->get ( 'ACCEPT' ) == "application/json") {
-		$app->response->headers->set ( 'Content-Type', 'application/json' );
-		$movie = array (
-				"movie" => $movie [0]
+	$data = $app->request->post();
+	$movie = $db->insert("movie", $data);
+	if($movie){
+		$app->response->setStatus(200);
+		$movie = $db->select("movie", "*", ["id[=]" => $movie]);
+		if($app->request()->get('format') == "xml" or $app->request->headers->get('ACCEPT') == "application/xml"){
+			$app->response->headers->set('Content-Type', 'application/xml');
+			// Creating object of SimpleXMLElement
+			$xml_data = new SimpleXMLElement('<?xml version="1.0"?><movie></movie>');
+			// Function call to convert array to xml
+			array_to_xml($movie[0],$xml_data);
+			echo $xml_data->asXML();
+		}else{
+			$app->response->headers->set('Content-Type', 'application/json');
+			$movie = array("movie" => $movie[0]);
+			echo json_encode($movie);
+		}
+	}else{
+		/*
+			Error
+		*/
+		$app->response->setStatus(400);
+		$error = array(
+			"message" => "Something went wrong"
 		);
-		echo json_encode ( $movie );
-	} else if ($app->request ()->get ( 'format' ) == "xml" or $app->request->headers->get ( 'ACCEPT' ) == "application/xml") {
-		$app->response->headers->set ( 'Content-Type', 'application/xml' );
-		// Creating object of SimpleXMLElement
-		$xml_data = new SimpleXMLElement ( '<?xml version="1.0"?><movie></movie>' );
-		// Function call to convert array to xml
-		array_to_xml ( $movie [0], $xml_data );
-		echo $xml_data->asXML ();
-	} else {
-		$app->response->headers->set ( 'Content-Type', 'text/html' );
-		$app->render ( 'movie.php', array (
-				"movie" => $movie [0]
-		) );
+		if($app->request()->get('format') == "xml" or $app->request->headers->get('ACCEPT') == "application/xml"){
+			$app->response->headers->set('Content-Type', 'application/xml');
+			// Creating object of SimpleXMLElement
+			$xml_data = new SimpleXMLElement('<?xml version="1.0"?><error></error>');
+			// Function call to convert array to xml
+			array_to_xml($error,$xml_data);
+			echo $xml_data->asXML();
+		}else{
+			$app->response->headers->set('Content-Type', 'application/json');
+			$movie = array("error" => $error);
+			echo json_encode($error);
+		}
 	}
 }
 
